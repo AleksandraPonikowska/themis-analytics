@@ -218,7 +218,7 @@ def get_tasks(session):
     all_tasks = []
 
     for tr in rows:
-        list_ids = tr.get('x-lists').split()
+        list_ids = tr.get('x-lists').split(",")
         code_td = tr.find('td', class_='problem-code')
         name_td = tr.find('td', class_='problem-name')
         term_td = tr.find('td', class_='problem-term')
@@ -230,14 +230,15 @@ def get_tasks(session):
         title = name_td.get_text(strip=True)
         dates = term_td.get_text(separator='|', strip=True).split('|') if term_td else ["", ""]
 
-        for lid in list_ids:
-            all_tasks.append({
-                'code': task_code,
-                'title': title,
-                'soft_deadline': dates[0] if len(dates) > 0 else "",
-                'hard_deadline': dates[1] if len(dates) > 1 else "",
-                'list_id': lid
-            })
+        first_lid = list_ids[0] if list_ids else "0"
+
+        all_tasks.append({
+            'code': task_code,
+            'title': title,
+            'soft_deadline': dates[0] if len(dates) > 0 else "",
+            'hard_deadline': dates[1] if len(dates) > 1 else "",
+            'list_id': first_lid
+        })
 
     df_tasks = pd.DataFrame(all_tasks)
     save_csv_safely(df_tasks, TASKS_FILE)
